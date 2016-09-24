@@ -7,22 +7,57 @@ function readText() {
 	processText(inText);
 }
 
-function handleQuestion(txt) {
+function handleQuestion() {
 	//Deal with user asking a question
 
 	return "I don't know...";
 }
 
-function handleNo(txt) {
+function handleNo() {
 	//Deal with no-type answers from user
 
 	return "Why not?";
 }
 
-function handleYes(txt) {
+function handleYes() {
 	//Deal with yes-type answers from user
 
 	return "Oh yeah?";
+}
+
+function handleBecause() {
+	//Deal with "because" answers
+
+	var response1 = ["Ah, yes. ", "Hmmm. ", "I see. ", "Gotcha. "];
+	var response2 = ["Can you elaborate?", "Care to tell me more?"];
+
+	var rChoice1 = Math.floor(Math.random() * response1.length);
+	var rChoice2 = Math.floor(Math.random() * response2.length);
+
+	var prompt = response1[rChoice1] + response2[rChoice2];
+
+	return prompt;
+}
+
+function handleThanks() {
+	//In case the user is polite...
+
+	var urWelcome = ["You are very welcome.", "You're quite welcome.", "No probs!"];
+
+	var welcome = urWelcome[Math.floor(Math.random() * urWelcome.length)];
+	return welcome;
+}
+
+function handleBad() {
+	//Deal with negative responses
+
+	return "I'm sorry to hear that."
+}
+
+function handleGood() {
+	//Deal with positive responses
+
+	return "That's good to hear."
 }
 
 function handlePronouns(txt) {
@@ -206,7 +241,7 @@ function handlePronouns(txt) {
 function createHeader() {
 	//Create lead-in to response
 
-	var headerList = ["Golly. ", "Gee. ", "Goodness me. ", "Oh my. ", "Golly gee. ", "Oh me oh my. ", "Hmmm. ", "Goodness gracious. ", "Well I'll be. ", ''];
+	var headerList = ["Golly. ", "Gee. ", "Goodness me. ", "Oh my. ", "Golly gee. ", "Oh me oh my. ", "Hmmm. ", "Goodness gracious. ", "Well I'll be. ", "Gee willikers!", ''];
 	var qList = ["Why do you think that ", "Any idea why ", "Why do you believe that ", "Why do you feel that ", "Any theories as to why ", "What makes you say that ", "Can you explain why "];
 
 	var hChoice = Math.floor(Math.random() * headerList.length);
@@ -224,6 +259,13 @@ function processText(txt) {
 	var endText;
 	var noAnswer = false;
 	var yesAnswer = false;
+	var becauseAnswer = false;
+	var thanksAnswer = false;
+	var badAnswer = false;
+	var goodAnswer = false;
+
+	var negList = ["bad", "sad", "unhappy", "terrible", "blegh", "meh"];
+	var posList = ["good", "well", "happy", "great", "excellent"];
 
 	var noList = ["no", "nah", "not", "nothing", "don't", "dont"];
 	var yesList = ["yes", "yeah", "yea"];
@@ -264,15 +306,91 @@ function processText(txt) {
 		}
 	}
 
+	//Look for "because" answers
+	for (var m = 0; m < txtEdit.length; m++) {
+		if (txtEdit[m].toLowerCase() == "because") {
+			becauseAnswer = true;
+			break;
+		}
+	}
+
+	//Look to see if user thanks CARL
+	for (var n = 0; n < txtEdit.length; n++) {
+		if (txtEdit[n].toLowerCase() == "thanks" || txtEdit[n].toLowerCase() == "thank") {
+			thanksAnswer = true;
+			break;
+		}
+	}
+
+
+	//Look for negative responses
+	for (var o = 0; o < txtEdit.length; o++) {
+		var neg;
+		for (neg in negList) {
+			if (txtEdit[o].toLowerCase() == negList[neg]) {
+				badAnswer = true;
+				var not1 = "";
+				var not2 = "";
+				if (o >= 2) {
+					not1 = txtEdit[o-2].toLowerCase();
+				}
+				if (o >= 1) {
+					not2 = txtEdit[o-1].toLowerCase();
+				}
+				if (not1 == "not" || not2 == "not") {
+					badAnswer = false;
+					goodAnswer = true;
+				}
+				break;
+			}
+		}
+	}
+
+	//Look for positive responses
+	for (var p = 0; p < txtEdit.length; p++) {
+		var pos;
+		for (pos in posList) {
+			if (txtEdit[p].toLowerCase() == posList[pos]) {
+				goodAnswer = true;
+				//Look for negation
+				var not3 = "";
+				var not4 = "";
+				if (p >= 2) {
+					not3 = txtEdit[p-2].toLowerCase();
+				}
+				if (p >= 1) {
+					not4 = txtEdit[p-1].toLowerCase();
+				}
+				if (not3 == "not" || not4 == "not") {
+					goodAnswer = false;
+					badAnswer = true;
+				}
+				break;
+			}
+		}
+	}
+
 	//Pick appropriate response type
-	if (noAnswer) {
+	if (txtEdit[txtEdit.length-1].endsWith("?")) {
+		endText = handleQuestion();
+	}
+	else if (badAnswer) {
+		endText = handleBad();
+	}
+	else if (goodAnswer) {
+		endText	 = handleGood();
+	}
+	else if (noAnswer) {
 		endText = handleNo();
+	}
+	else if (thanksAnswer) {
+		endText = handleThanks();
+	}
+	else if (becauseAnswer) {
+		endText = handleBecause();
 	}
 	else if (yesAnswer) {
 		endText = handleYes();
-	}
-	else if (txtEdit[txtEdit.length-1].endsWith("?")) {
-		endText = handleQuestion(txtEdit);
 	}
 	else {
 		endText = handlePronouns(txtEdit);
