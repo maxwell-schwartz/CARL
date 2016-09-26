@@ -7,6 +7,18 @@ function readText() {
 	processText(inText);
 }
 
+function handleEmpty() {
+	//Deal with user not saying anything
+
+	return "Hello? Are you there?";
+}
+
+function handleGreeting() {
+	//Deal with greetings
+
+	return "Hi! Tell me a bit about yourself."
+}
+
 function handleQuestion() {
 	//Deal with user asking a question
 
@@ -263,12 +275,15 @@ function processText(txt) {
 	var thanksAnswer = false;
 	var badAnswer = false;
 	var goodAnswer = false;
+	var greeted = false;
 
-	var negList = ["bad", "sad", "unhappy", "terrible", "blegh", "meh"];
-	var posList = ["good", "well", "happy", "great", "excellent"];
+	var greetingsList = ["hello", "hi", "hiya"];
 
-	var noList = ["no", "nah", "not", "nothing", "don't", "dont"];
-	var yesList = ["yes", "yeah", "yea"];
+	var negList = ["bad", "sad", "unhappy", "terrible", "blegh", "meh", "shabby"];
+	var posList = ["good", "well", "happy", "great", "excellent", "wonderful"];
+
+	var noList = ["no", "nah", "not", "nothing", "don't", "dont", "nope"];
+	var yesList = ["yes", "yeah", "yea", "yup"];
 
 	var txtList = txt.split(" ");
 	var txtEdit = txt.split(" ");
@@ -370,8 +385,23 @@ function processText(txt) {
 		}
 	}
 
+	//Remove greetings
+	for (var q = 0; q < txtEdit.length; q++) {
+		for (g in greetingsList) {
+			if (greetingsList[g] == txtEdit[q].toLowerCase()) {
+				greeted = true;
+			}
+		}
+	}
+
 	//Pick appropriate response type
-	if (txtEdit[txtEdit.length-1].endsWith("?")) {
+	if (txtEdit == "") {
+		endText = handleEmpty();
+	}
+	else if (greeted) {
+		endText = handleGreeting();
+	}
+	else if (txtEdit[txtEdit.length-1].endsWith("?")) {
 		endText = handleQuestion();
 	}
 	else if (badAnswer) {
